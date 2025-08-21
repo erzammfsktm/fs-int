@@ -28,6 +28,10 @@ app.get("/students", (req, res) => {
   });
 });
 
+app.get("/", (req, res) => {
+  res.send("🎉 Backend is alive. Use /students to get data.");
+});
+
 // API: add new student
 app.post("/students", (req, res) => {
   const { name, email, coordinator_id, faculty_supervisor_id, industry_supervisor_id } = req.body;
