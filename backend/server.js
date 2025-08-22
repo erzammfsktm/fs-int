@@ -1,10 +1,18 @@
 import express from "express";
 import mysql from "mysql2";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// For __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// 👉 Serve static files from "public" folder
 app.use(express.static(path.join(__dirname, "public")));
 
 // MySQL connection
@@ -29,10 +37,6 @@ app.get("/students", (req, res) => {
   });
 });
 
-app.get("/", (req, res) => {
-  res.send("🎉 Backend is alive. Use /students to get data.");
-});
-
 // API: add new student
 app.post("/students", (req, res) => {
   const { name, email, coordinator_id, faculty_supervisor_id, industry_supervisor_id } = req.body;
@@ -44,6 +48,11 @@ app.post("/students", (req, res) => {
       else res.json({ id: result.insertId, ...req.body });
     }
   );
+});
+
+// Fallback: serve index.html for unknown routes
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 app.listen(5000, () => console.log("Server running on port 5000"));
