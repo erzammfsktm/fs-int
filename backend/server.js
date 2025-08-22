@@ -2,18 +2,13 @@ import express from "express";
 import mysql from "mysql2";
 import cors from "cors";
 import path from "path";
-import { fileURLToPath } from "url";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// For __dirname in ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// 👉 Serve static files from "public" folder
-app.use(express.static(path.join(__dirname, "public")));
+// Serve frontend files
+app.use(express.static("public"));
 
 // MySQL connection
 const db = mysql.createConnection({
@@ -23,7 +18,6 @@ const db = mysql.createConnection({
   database: "internships"
 });
 
-// Test connection
 db.connect(err => {
   if (err) console.error("DB connection error:", err);
   else console.log("Connected to MySQL!");
@@ -50,9 +44,10 @@ app.post("/students", (req, res) => {
   );
 });
 
-// Fallback: serve index.html for unknown routes
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+// Fallback: serve index.html for root
+app.get("/", (req, res) => {
+  res.sendFile(path.resolve("public/index.html"));
 });
 
-app.listen(5000, () => console.log("Server running on port 5000"));
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
